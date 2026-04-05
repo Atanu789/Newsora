@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --canvas: #fff9f1;
+  --panel: #ffffff;
+  --panel-muted: #fff4e8;
+  --ink: #1d1712;
+  --accent: #ff6a2e;
+  --accent-soft: #ffe3cf;
+  --ring: rgba(255, 106, 46, 0.23);
+}
+
+.dark {
+  --canvas: #15120f;
+  --panel: #1e1814;
+  --panel-muted: #281f18;
+  --ink: #f8f2eb;
+  --accent: #ff9d4d;
+  --accent-soft: #3e2a1c;
+  --ring: rgba(255, 157, 77, 0.25);
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(255, 130, 64, 0.22), transparent 38%),
+    radial-gradient(circle at 100% 24%, rgba(255, 198, 93, 0.2), transparent 36%),
+    radial-gradient(circle at 50% 100%, rgba(255, 152, 94, 0.12), transparent 30%),
+    var(--canvas);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+}
+
+.glass-panel {
+  background: color-mix(in srgb, var(--panel) 88%, white 12%);
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, transparent);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.08);
+}
