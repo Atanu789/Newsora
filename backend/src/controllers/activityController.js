@@ -4,7 +4,7 @@ const activityModel = require('../models/activityModel');
 
 const schema = Joi.object({
   newsId: Joi.number().integer().required(),
-  action: Joi.string().valid('click', 'view', 'save', 'share').required(),
+  action: Joi.string().valid('click', 'view', 'save', 'share', 'hide').required(),
   readTime: Joi.number().integer().min(0).default(0)
 });
 

@@ -5,17 +5,27 @@ import { Show, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { defaultLanguageCode, languageOptions } from '@/lib/languages';
+import { t } from '@/lib/i18n';
 
 const navItems = [
-  { label: 'Feed', href: '/' },
-  { label: 'Profile', href: '/profile' },
-  { label: 'Tech', href: '/?category=Tech' },
-  { label: 'Finance', href: '/?category=Financial' }
+  { key: 'nav.trending' as const, href: '/?category=Trending', category: 'Trending' },
+  { key: 'nav.world' as const, href: '/?category=World', category: 'World' },
+  { key: 'nav.election' as const, href: '/?category=Election', category: 'Election' },
+  { key: 'nav.state' as const, href: '/?category=State%20News', category: 'State News' }
+];
+
+const moreItems = [
+  { key: 'nav.sports' as const, href: '/?category=Sports', category: 'Sports' },
+  { key: 'nav.tech' as const, href: '/?category=Tech', category: 'Tech' },
+  { key: 'nav.business' as const, href: '/?category=Financial', category: 'Financial' },
+  { key: 'nav.health' as const, href: '/?category=Health', category: 'Health' },
+  { key: 'nav.entertainment' as const, href: '/?category=Entertainment', category: 'Entertainment' }
 ];
 
 export function TopBar() {
   const [isDark, setIsDark] = useState<boolean>(false);
   const [languageModalOpen, setLanguageModalOpen] = useState(false);
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([defaultLanguageCode]);
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -99,17 +109,17 @@ export function TopBar() {
             const itemCategory = itemUrl.searchParams.get('category');
             const active =
               pathname === itemUrl.pathname &&
-              ((itemCategory && itemCategory === activeCategory) || (!itemCategory && !activeCategory));
+              itemCategory === activeCategory;
 
             return (
               <Link
-                key={item.label}
+                key={item.key}
                 href={withLang(item.href)}
                 className={`group relative rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                   active ? 'text-accent' : 'text-zinc-700 hover:text-accent dark:text-zinc-200'
                 }`}
               >
-                {item.label}
+                {t(activeLanguage, item.key)}
                 <span
                   className={`absolute inset-x-3 -bottom-0.5 h-0.5 origin-left rounded-full bg-accent transition-transform duration-200 ${
                     active ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
@@ -118,6 +128,51 @@ export function TopBar() {
               </Link>
             );
           })}
+
+          {/* More Menu */}
+          <div className="relative">
+            <button
+              onClick={() => setMoreMenuOpen(!moreMenuOpen)}
+              className={`group relative rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                moreMenuOpen ? 'text-accent' : 'text-zinc-700 hover:text-accent dark:text-zinc-200'
+              }`}
+            >
+              {t(activeLanguage, 'nav.more')}
+              <span
+                className={`absolute inset-x-3 -bottom-0.5 h-0.5 origin-left rounded-full bg-accent transition-transform duration-200 ${
+                  moreMenuOpen ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                }`}
+              />
+            </button>
+
+            {/* Dropdown Menu */}
+            {moreMenuOpen && (
+              <div className="absolute top-full right-0 mt-2 w-48 rounded-xl border border-zinc-200/80 bg-panel/95 backdrop-blur-xl shadow-lg dark:border-zinc-700/80 z-50">
+                {moreItems.map((item) => {
+                  const itemUrl = new URL(item.href, 'http://localhost');
+                  const itemCategory = itemUrl.searchParams.get('category');
+                  const active =
+                    pathname === itemUrl.pathname &&
+                    itemCategory === activeCategory;
+
+                  return (
+                    <Link
+                      key={item.key}
+                      href={withLang(item.href)}
+                      onClick={() => setMoreMenuOpen(false)}
+                      className={`block px-4 py-2 text-sm transition-colors first:rounded-t-lg last:rounded-b-lg ${
+                        active
+                          ? 'bg-accentSoft text-accent'
+                          : 'text-zinc-700 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-800'
+                      }`}
+                    >
+                      {t(activeLanguage, item.key)}
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </nav>
 
         <div className="flex items-center gap-2">
@@ -130,12 +185,12 @@ export function TopBar() {
           <Show when="signed-out">
             <SignInButton mode="modal">
               <button className="hidden rounded-full border border-zinc-300 bg-panel px-3 py-1 text-sm dark:border-zinc-700 sm:inline-flex">
-                Sign in
+                {t(activeLanguage, 'auth.signIn')}
               </button>
             </SignInButton>
             <SignUpButton mode="modal">
               <button className="hidden rounded-full bg-accent px-3 py-1 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(255,106,46,0.35)] sm:inline-flex">
-                Join
+                {t(activeLanguage, 'auth.join')}
               </button>
             </SignUpButton>
           </Show>
@@ -146,7 +201,7 @@ export function TopBar() {
             onClick={toggleDarkMode}
             className="rounded-full border border-zinc-300 bg-panel px-3 py-1 text-sm dark:border-zinc-700"
           >
-            {isDark ? 'Light' : 'Dark'}
+            {isDark ? t(activeLanguage, 'theme.light') : t(activeLanguage, 'theme.dark')}
           </button>
         </div>
       </div>
@@ -155,7 +210,7 @@ export function TopBar() {
       {languageModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4" onClick={() => setLanguageModalOpen(false)}>
           <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-panel p-4 dark:border-zinc-800" onClick={(event) => event.stopPropagation()}>
-            <h3 className="text-lg font-semibold">Select preferred languages</h3>
+            <h3 className="text-lg font-semibold">{t(activeLanguage, 'lang.selectTitle')}</h3>
             <div className="mt-4 grid grid-cols-2 gap-2">
               {languageOptions.map((language) => {
                 const active = selectedLanguages.includes(language.code);
@@ -177,10 +232,10 @@ export function TopBar() {
                 onClick={() => setLanguageModalOpen(false)}
                 className="rounded-full border border-zinc-300 px-3 py-1 text-sm dark:border-zinc-700"
               >
-                Cancel
+                {t(activeLanguage, 'common.cancel')}
               </button>
               <button onClick={applyLanguages} className="rounded-full bg-accent px-3 py-1 text-sm font-semibold text-white">
-                Apply
+                {t(activeLanguage, 'common.apply')}
               </button>
             </div>
           </div>

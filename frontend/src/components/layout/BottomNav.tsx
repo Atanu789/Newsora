@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
+import { t } from '@/lib/i18n';
 
 const items = [
-  { label: 'Feed', href: '/' },
-  { label: 'Tech', href: '/?category=Tech' },
-  { label: 'Finance', href: '/?category=Financial' },
-  { label: 'World', href: '/?category=Social' },
-  { label: 'Profile', href: '/profile' }
+  { key: 'nav.feed' as const, href: '/' },
+  { key: 'nav.tech' as const, href: '/?category=Tech' },
+  { key: 'nav.finance' as const, href: '/?category=Financial' },
+  { key: 'nav.world' as const, href: '/?category=Social' },
+  { key: 'nav.profile' as const, href: '/profile' }
 ];
 
 export function BottomNav() {
@@ -29,7 +30,7 @@ export function BottomNav() {
       <div className="mx-auto grid h-full max-w-lg grid-cols-5 gap-2 text-center text-[11px] font-medium">
         {items.map((item) => (
           <Link
-            key={item.label}
+            key={item.key}
             href={withLang(item.href)}
             className={`flex items-center justify-center rounded-xl px-2 ${
               (item.href === '/' && pathname === '/' && !category) ||
@@ -40,7 +41,7 @@ export function BottomNav() {
                 : 'bg-zinc-100 dark:bg-zinc-800'
             }`}
           >
-            {item.label}
+            {t(lang, item.key)}
           </Link>
         ))}
       </div>

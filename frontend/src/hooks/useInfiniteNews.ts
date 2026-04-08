@@ -3,6 +3,7 @@ import { NewsItem } from '@/lib/types';
 import { fetchNews, fetchNewsByCategory, fetchRecommendedNews } from '@/services/api';
 
 export function useInfiniteNews(params?: { category?: string; recommended?: boolean; token?: string | null; lang?: string }) {
+  const AUTO_LOAD_PAGE_LIMIT = 2;
   const category = params?.category;
   const recommended = Boolean(params?.recommended);
   const token = params?.token;
@@ -13,6 +14,7 @@ export function useInfiniteNews(params?: { category?: string; recommended?: bool
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [autoLoadEnabled, setAutoLoadEnabled] = useState(true);
+  const [autoLoadStopped, setAutoLoadStopped] = useState(false);
 
   const isInitialLoad = items.length === 0 && loading;
   const isLoadingRef = useRef(false);
@@ -20,6 +22,11 @@ export function useInfiniteNews(params?: { category?: string; recommended?: bool
 
   const loadMore = useCallback(async (manual = false, requestedPage?: number) => {
     if (isLoadingRef.current || !hasMore) return;
+    if (!manual && nextPageOverAutoLimit(requestedPage ?? page, AUTO_LOAD_PAGE_LIMIT)) {
+      setAutoLoadEnabled(false);
+      setAutoLoadStopped(true);
+      return;
+    }
     if (!manual && !autoLoadEnabled) return;
 
     const nextPage = requestedPage ?? page;
@@ -73,6 +80,7 @@ export function useInfiniteNews(params?: { category?: string; recommended?: bool
     setHasMore(true);
     setError(null);
     setAutoLoadEnabled(true);
+    setAutoLoadStopped(false);
     loadMore(true, 1);
   }, [category, recommended, token, lang]);
 
@@ -99,11 +107,17 @@ export function useInfiniteNews(params?: { category?: string; recommended?: bool
     loading,
     error,
     hasMore,
+    autoLoadStopped,
     isInitialLoad,
     sentinelRef,
+    loadMore: () => loadMore(true),
     retry: () => {
       setAutoLoadEnabled(true);
-      return loadMore(true, 1);
+      return loadMore(true);
     }
   };
+}
+
+function nextPageOverAutoLimit(page: number, limit: number) {
+  return page > limit;
 }

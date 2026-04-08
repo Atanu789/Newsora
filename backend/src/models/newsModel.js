@@ -110,6 +110,7 @@ async function findRecommendedByUser({ userId, pageSize, offset, priorityKeyword
         n.category,
         SUM(
           CASE ua.action
+            WHEN 'hide' THEN -4
             WHEN 'save' THEN 4
             WHEN 'share' THEN 4
             WHEN 'click' THEN 2

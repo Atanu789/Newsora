@@ -5,6 +5,7 @@ import { ScriptumLanding } from '../components/landing/ScriptumLanding';
 import { NewsFeed } from '@/components/news/NewsFeed';
 import { FloatingDock } from '@/components/ui/FloatingDock';
 import { GradientHero } from '@/components/ui/GradientHero';
+import { Footer } from '@/components/layout/Footer';
 
 export default async function HomePage({
   searchParams
@@ -13,9 +14,10 @@ export default async function HomePage({
 }) {
   const { userId } = await auth();
   const params = await searchParams;
+  const lang = params.lang || 'en';
 
   if (!userId) {
-    return <ScriptumLanding />;
+    return <ScriptumLanding lang={lang} />;
   }
 
   return (
@@ -23,8 +25,9 @@ export default async function HomePage({
       <TopBar />
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-4 md:px-6 xl:px-8">
         <GradientHero />
-        <NewsFeed initialCategory={params.category || ''} initialLanguage={params.lang || 'en'} />
+        <NewsFeed initialCategory={params.category || ''} initialLanguage={lang} />
       </div>
+      <Footer />
       <BottomNav />
       <FloatingDock />
     </main>

@@ -5,32 +5,42 @@
 @tailwind utilities;
 
 :root {
-  --canvas: #fff9f1;
-  --panel: #ffffff;
-  --panel-muted: #fff4e8;
-  --ink: #1d1712;
-  --accent: #ff6a2e;
-  --accent-soft: #ffe3cf;
-  --ring: rgba(255, 106, 46, 0.23);
+  --canvas: #0a0420;
+  --panel: #1a0f3a;
+  --panel-muted: #2d1b5e;
+  --ink: #f5f5fa;
+  --accent: #a855f7;
+  --accent-soft: #7c3aed;
+  --ring: rgba(168, 85, 247, 0.25);
 }
 
 .dark {
-  --canvas: #15120f;
-  --panel: #1e1814;
-  --panel-muted: #281f18;
-  --ink: #f8f2eb;
-  --accent: #ff9d4d;
-  --accent-soft: #3e2a1c;
-  --ring: rgba(255, 157, 77, 0.25);
+  --canvas: #0a0420;
+  --panel: #1a0f3a;
+  --panel-muted: #2d1b5e;
+  --ink: #f5f5fa;
+  --accent: #d084fc;
+  --accent-soft: #a855f7;
+  --ring: rgba(168, 85, 247, 0.25);
 }
 
 body {
   margin: 0;
-  background:
-    radial-gradient(circle at 0% 0%, rgba(255, 130, 64, 0.22), transparent 38%),
-    radial-gradient(circle at 100% 24%, rgba(255, 198, 93, 0.2), transparent 36%),
-    radial-gradient(circle at 50% 100%, rgba(255, 152, 94, 0.12), transparent 30%),
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.25) 0%, transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(168, 85, 247, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 50% 0%, rgba(167, 139, 250, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 50% 100%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
     var(--canvas);
+  background-size: 
+    200% 200%,
+    150% 150%,
+    180% 180%,
+    160% 160%,
+    100% 100%;
+  background-position: 0% 0%;
+  background-attachment: fixed;
+  animation: vortex 15s ease-in-out infinite;
   color: var(--ink);
   min-height: 100vh;
   min-height: 100dvh;
@@ -55,4 +65,37 @@ a {
   background: color-mix(in srgb, var(--panel) 88%, white 12%);
   border: 1px solid color-mix(in srgb, var(--accent) 24%, transparent);
   box-shadow: 0 14px 34px rgba(0, 0, 0, 0.08);
+}
+
+@keyframes vortex {
+  0% {
+    background-position: 0% 0%, 100% 0%, 50% 0%, 50% 100%;
+  }
+  25% {
+    background-position: 50% 50%, 50% 50%, 100% 100%, 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%, 0% 100%, 0% 0%, 100% 100%;
+  }
+  75% {
+    background-position: 50% 50%, 50% 50%, 50% 50%, 50% 50%;
+  }
+  100% {
+    background-position: 0% 0%, 100% 0%, 50% 0%, 50% 100%;
+  }
+}
+
+/* Vortex portal effect */
+.vortex-background {
+  position: fixed;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(168, 85, 247, 0.25) 0%, transparent 50%),
+    radial-gradient(circle at 50% 0%, rgba(167, 139, 250, 0.2) 0%, transparent 50%),
+    var(--canvas);
+  background-size: 200% 200%, 150% 150%, 180% 180%, 100% 100%;
+  animation: vortex 15s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
 }

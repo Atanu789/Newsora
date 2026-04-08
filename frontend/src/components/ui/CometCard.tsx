@@ -24,8 +24,8 @@ export function CometCard({ children, className = '' }: CometCardProps) {
     const px = (event.clientX - rect.left) / rect.width;
     const py = (event.clientY - rect.top) / rect.height;
 
-    const rotateY = (px - 0.5) * 20;
-    const rotateX = (0.5 - py) * 20;
+    const rotateY = (px - 0.5) * 12;
+    const rotateX = (0.5 - py) * 12;
 
     setTransform(`perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale(1.01)`);
   };
