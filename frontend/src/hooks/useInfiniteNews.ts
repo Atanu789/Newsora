@@ -1,8 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { NewsItem } from '@/lib/types';
-import { fetchNews, fetchNewsByCategory } from '@/services/api';
+import { fetchNews, fetchNewsByCategory, fetchRecommendedNews } from '@/services/api';
 
-export function useInfiniteNews(category?: string) {
+export function useInfiniteNews(params?: { category?: string; recommended?: boolean; token?: string | null; lang?: string }) {
+  const category = params?.category;
+  const recommended = Boolean(params?.recommended);
+  const token = params?.token;
+  const lang = params?.lang || 'en';
   const [items, setItems] = useState<NewsItem[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -26,9 +30,15 @@ export function useInfiniteNews(category?: string) {
     setError(null);
 
     try {
-      const data = category
-        ? await fetchNewsByCategory(category, nextPage, 8)
-        : await fetchNews(nextPage, 8);
+      const data = recommended
+        ? token
+          ? await fetchRecommendedNews(token, nextPage, 8, lang)
+          : (() => {
+              throw new Error('Sign in required');
+            })()
+        : category
+          ? await fetchNewsByCategory(category, nextPage, 8, lang)
+          : await fetchNews(nextPage, 8, lang);
 
       // Ignore stale responses from previous category/page requests.
       if (requestId !== latestRequestIdRef.current) return;
@@ -42,13 +52,17 @@ export function useInfiniteNews(category?: string) {
       setPage(nextPage + 1);
     } catch (e) {
       if (requestId !== latestRequestIdRef.current) return;
-      setError('Unable to load news feed right now.');
+      if (recommended && !token) {
+        setError('Sign in to unlock your recommended feed.');
+      } else {
+        setError('Unable to load news feed right now.');
+      }
       setAutoLoadEnabled(false);
     } finally {
       isLoadingRef.current = false;
       setLoading(false);
     }
-  }, [page, hasMore, autoLoadEnabled, category]);
+  }, [page, hasMore, autoLoadEnabled, category, recommended, token, lang]);
 
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
@@ -60,7 +74,7 @@ export function useInfiniteNews(category?: string) {
     setError(null);
     setAutoLoadEnabled(true);
     loadMore(true, 1);
-  }, [category]);
+  }, [category, recommended, token, lang]);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;

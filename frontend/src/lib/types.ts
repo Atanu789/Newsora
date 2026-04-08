@@ -6,6 +6,7 @@ export type NewsItem = {
   tags: string[];
   source: string;
   source_url: string;
+  image_url?: string | null;
   created_at: string;
 };
 

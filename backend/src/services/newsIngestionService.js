@@ -20,6 +20,7 @@ async function fetchFromGNews() {
   return (response.data.articles || []).map((article) => ({
     title: article.title,
     content: article.description || article.content || '',
+    imageUrl: article.image || null,
     source: article.source?.name || 'GNews',
     sourceUrl: article.url,
     externalId: article.url
@@ -45,6 +46,7 @@ async function ingestNews() {
     await newsModel.create({
       title: item.title,
       content: item.content?.slice(0, 500),
+      imageUrl: item.imageUrl || null,
       summary: ai.summary,
       category: ai.category,
       tags: ai.tags,

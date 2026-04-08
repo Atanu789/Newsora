@@ -2,13 +2,14 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { NewsDetail } from '@/lib/types';
+import { NewsPreviewImage } from '@/components/news/NewsPreviewImage';
 
 export const dynamic = 'force-dynamic';
 
-async function getNewsDetail(id: string): Promise<NewsDetail | null> {
+async function getNewsDetail(id: string, lang: string): Promise<NewsDetail | null> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api';
 
-  const response = await fetch(`${baseUrl}/news/${id}`, {
+  const response = await fetch(`${baseUrl}/news/${id}?lang=${encodeURIComponent(lang)}`, {
     cache: 'no-store'
   });
 
@@ -18,9 +19,17 @@ async function getNewsDetail(id: string): Promise<NewsDetail | null> {
   return response.json();
 }
 
-export default async function NewsDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function NewsDetailPage({
+  params,
+  searchParams
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ lang?: string }>;
+}) {
   const { id } = await params;
-  const article = await getNewsDetail(id);
+  const query = await searchParams;
+  const lang = query.lang || 'en';
+  const article = await getNewsDetail(id, lang);
 
   if (!article) {
     notFound();
@@ -28,11 +37,15 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-3xl px-4 py-6">
-      <Link href="/" className="text-sm font-semibold text-accent">
+      <Link href={`/?lang=${encodeURIComponent(lang)}`} className="text-sm font-semibold text-accent">
         Back to feed
       </Link>
 
       <article className="glass-panel mt-4 rounded-2xl p-5">
+        <div className="mb-4 h-52 overflow-hidden rounded-xl sm:h-72">
+          <NewsPreviewImage src={article.image_url} alt={article.title} category={article.category} priority />
+        </div>
+
         <div className="mb-4 flex flex-wrap items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
           <span className="rounded-full bg-accentSoft px-3 py-1 font-semibold text-accent">{article.category}</span>
           <span>{new Date(article.created_at).toLocaleString()}</span>

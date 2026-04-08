@@ -33,6 +33,14 @@ body {
     var(--canvas);
   color: var(--ink);
   min-height: 100vh;
+  min-height: 100dvh;
+  -webkit-overflow-scrolling: touch;
+}
+
+html,
+body {
+  overscroll-behavior-y: none;
+  scroll-behavior: smooth;
 }
 
 * {

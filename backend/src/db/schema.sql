@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS news (
   id BIGSERIAL PRIMARY KEY,
   title TEXT NOT NULL,
   content TEXT,
+  image_url TEXT,
   summary TEXT,
   category VARCHAR(64),
   tags JSONB DEFAULT '[]'::jsonb,
@@ -32,6 +33,8 @@ CREATE TABLE IF NOT EXISTS news (
   external_id TEXT UNIQUE,
   created_at TIMESTAMP DEFAULT NOW()
 );
+
+ALTER TABLE news ADD COLUMN IF NOT EXISTS image_url TEXT;
 
 CREATE TABLE IF NOT EXISTS user_activity (
   id BIGSERIAL PRIMARY KEY,
