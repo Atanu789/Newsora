@@ -21,7 +21,11 @@ export function useInfiniteNews(params?: { category?: string; recommended?: bool
   const latestRequestIdRef = useRef(0);
 
   const loadMore = useCallback(async (manual = false, requestedPage?: number) => {
-    if (isLoadingRef.current || !hasMore) return;
+    const nextPage = requestedPage ?? page;
+    const isFreshLoad = nextPage === 1;
+
+    if (isLoadingRef.current) return;
+    if (!isFreshLoad && !hasMore) return;
     if (!manual && nextPageOverAutoLimit(requestedPage ?? page, AUTO_LOAD_PAGE_LIMIT)) {
       setAutoLoadEnabled(false);
       setAutoLoadStopped(true);
@@ -29,7 +33,6 @@ export function useInfiniteNews(params?: { category?: string; recommended?: bool
     }
     if (!manual && !autoLoadEnabled) return;
 
-    const nextPage = requestedPage ?? page;
     const requestId = ++latestRequestIdRef.current;
 
     isLoadingRef.current = true;

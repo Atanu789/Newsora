@@ -8,9 +8,16 @@ const parser = new Parser({
 });
 
 const RSS_SOURCES = [
-  { url: 'https://feeds.bbci.co.uk/news/rss.xml', sourceLabel: 'BBC World' },
-  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/World.xml', sourceLabel: 'NYTimes World' },
-  { url: 'https://www.hindustantimes.com/feeds/rss/cities/kolkata-news/rssfeed.xml', sourceLabel: 'HT Kolkata' }
+  { url: 'https://www.hindustantimes.com/feeds/rss/india-news/rssfeed.xml', sourceLabel: 'HT India' },
+  { url: 'https://www.hindustantimes.com/feeds/rss/cities/kolkata-news/rssfeed.xml', sourceLabel: 'HT Kolkata' },
+  { url: 'https://www.thehindu.com/news/national/feeder/default.rss', sourceLabel: 'The Hindu National' },
+  { url: 'https://www.thehindu.com/news/cities/feeder/default.rss', sourceLabel: 'The Hindu Cities' },
+  { url: 'https://indianexpress.com/section/india/feed/', sourceLabel: 'Indian Express India' },
+  { url: 'https://indianexpress.com/section/cities/feed/', sourceLabel: 'Indian Express Cities' },
+  { url: 'https://timesofindia.indiatimes.com/rssfeeds/-2128936835.cms', sourceLabel: 'TOI India' },
+  { url: 'https://timesofindia.indiatimes.com/rssfeeds/66949542.cms', sourceLabel: 'TOI World' },
+  { url: 'https://feeds.bbci.co.uk/news/world/asia/india/rss.xml', sourceLabel: 'BBC India' },
+  { url: 'https://feeds.bbci.co.uk/news/rss.xml', sourceLabel: 'BBC World' }
 ];
 
 function extractImageUrl(item) {

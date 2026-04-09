@@ -11,15 +11,18 @@ const primaryTabs = [
   { key: 'feed.recommended' as const, value: 'recommended' },
   { key: 'feed.home' as const, value: '' },
   { key: 'nav.tech' as const, value: 'Tech' },
-  { key: 'nav.world' as const, value: 'Social' },
+  { key: 'nav.world' as const, value: 'World' },
   { key: 'feed.business' as const, value: 'Financial' }
 ];
 
 const moreTabs = [
-  { label: 'Social', value: 'Social' },
+  { label: 'World', value: 'World' },
   { label: 'Environmental', value: 'Environmental' },
-  { label: 'Political', value: 'Political' },
+  { label: 'Election', value: 'Election' },
   { label: 'Health', value: 'Health' },
+  { label: 'Sports', value: 'Sports' },
+  { label: 'State News', value: 'State News' },
+  { label: 'Entertainment', value: 'Entertainment' },
   { label: 'Campaigning', value: 'Campaigning' }
 ];
 

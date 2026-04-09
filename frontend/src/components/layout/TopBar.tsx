@@ -8,7 +8,7 @@ import { defaultLanguageCode, languageOptions } from '@/lib/languages';
 import { t } from '@/lib/i18n';
 
 const navItems = [
-  { key: 'nav.trending' as const, href: '/?category=Trending', category: 'Trending' },
+  { key: 'nav.trending' as const, href: '/', category: '' },
   { key: 'nav.world' as const, href: '/?category=World', category: 'World' },
   { key: 'nav.election' as const, href: '/?category=Election', category: 'Election' },
   { key: 'nav.state' as const, href: '/?category=State%20News', category: 'State News' }

@@ -29,7 +29,7 @@ async function findPaginated({ category, pageSize, offset, priorityKeywords = []
 
   if (category) {
     values.push(category);
-    whereParts.push(`category = $${values.length}`);
+    whereParts.push(`LOWER(category) = LOWER($${values.length})`);
   }
 
   const where = whereParts.length > 0 ? `WHERE ${whereParts.join(' AND ')}` : '';

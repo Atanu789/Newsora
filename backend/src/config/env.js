@@ -17,6 +17,9 @@ module.exports = {
     ? process.env.CLERK_JWKS_PUBLIC_KEY.replace(/\\n/g, '\n')
     : undefined,
   aiProvider: process.env.AI_PROVIDER || 'openai',
+  gnewsCountry: process.env.GNEWS_COUNTRY || 'in',
+  gnewsLanguage: process.env.GNEWS_LANGUAGE || 'en',
+  gnewsMaxPerTopic: Number(process.env.GNEWS_MAX_PER_TOPIC || 10),
   frontendOrigin: process.env.FRONTEND_ORIGIN || 'http://localhost:3000',
   adminEmails: String(process.env.ADMIN_EMAILS || '')
     .split(',')

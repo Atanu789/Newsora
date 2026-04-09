@@ -3,16 +3,25 @@ const Joi = require('joi');
 const asyncHandler = require('../middleware/asyncHandler');
 const newsModel = require('../models/newsModel');
 const { parsePagination } = require('../utils/pagination');
-const { ALLOWED_CATEGORIES, SUPPORTED_LANGUAGE_CODES, normalizeLanguageCode, translateText } = require('../services/aiService');
+const {
+  SUPPORTED_LANGUAGE_CODES,
+  normalizeLanguageCode,
+  normalizeCategoryInput,
+  translateText
+} = require('../services/aiService');
 
 const querySchema = Joi.object({
-  category: Joi.string().valid(...ALLOWED_CATEGORIES).optional(),
+  category: Joi.string().trim().optional(),
   lang: Joi.string().valid(...SUPPORTED_LANGUAGE_CODES).optional(),
   page: Joi.number().integer().min(1).optional(),
   pageSize: Joi.number().integer().min(1).max(50).optional()
 });
 
 const LANGUAGE_REGION_PRIORITY = {
+  en: {
+    region: 'India',
+    keywords: ['india', 'indian', 'new delhi', 'delhi', 'mumbai', 'kolkata', 'bengaluru', 'chennai', 'hyderabad', 'pune']
+  },
   bn: {
     region: 'West Bengal',
     keywords: ['west bengal', 'kolkata', 'bengal', 'howrah', 'siliguri', 'পশ্চিমবঙ্গ', 'কলকাতা']
@@ -49,7 +58,7 @@ const getNews = asyncHandler(async (req, res) => {
 
   const { page, pageSize, offset } = parsePagination(value);
   const data = await newsModel.findPaginated({
-    category: value.category,
+    category: normalizeCategoryInput(value.category),
     pageSize,
     offset,
     priorityKeywords: getPriorityKeywords(normalizeLanguageCode(value.lang))

@@ -2,16 +2,57 @@ const axios = require('axios');
 const env = require('../config/env');
 
 const ALLOWED_CATEGORIES = [
+  'World',
+  'Election',
+  'State News',
+  'Sports',
+  'Entertainment',
   'Environmental',
-  'Social',
   'Financial',
-  'Political',
   'Campaigning',
   'Tech',
   'Health'
 ];
 
+const CATEGORY_ALIASES = {
+  trending: '',
+  latest: '',
+  social: 'World',
+  world: 'World',
+  international: 'World',
+  entertainment: 'Entertainment',
+  cinema: 'Entertainment',
+  movie: 'Entertainment',
+  movies: 'Entertainment',
+  celebrity: 'Entertainment',
+  'state news': 'State News',
+  state: 'State News',
+  local: 'State News',
+  election: 'Election',
+  elections: 'Election',
+  politics: 'Election',
+  political: 'Election',
+  business: 'Financial',
+  finance: 'Financial',
+  economic: 'Financial',
+  sports: 'Sports',
+  technology: 'Tech'
+};
+
 const SUPPORTED_LANGUAGE_CODES = ['en', 'hi', 'bn', 'ta', 'te', 'mr', 'gu', 'kn', 'ml', 'pa', 'or', 'ur', 'ne', 'as'];
+
+const CATEGORY_KEYWORDS = {
+  World: ['world', 'global', 'international', 'diplomatic', 'foreign affairs', 'un', 'united nations', 'geopolitics'],
+  Election: ['election', 'poll', 'vote', 'voter', 'ballot', 'candidate', 'campaign trail', 'constituency', 'assembly election', 'lok sabha'],
+  'State News': ['kolkata', 'west bengal', 'mumbai', 'maharashtra', 'chennai', 'tamil nadu', 'hyderabad', 'karnataka', 'kerala', 'district', 'municipal', 'state govt'],
+  Sports: ['sport', 'sports', 'cricket', 'football', 'fifa', 'ipl', 'olympic', 'athlete', 'tournament', 'match', 'league'],
+  Entertainment: ['entertainment', 'film', 'movie', 'cinema', 'series', 'music', 'celebrity', 'bollywood', 'hollywood', 'showbiz'],
+  Tech: ['tech', 'technology', 'ai', 'artificial intelligence', 'software', 'startup', 'cyber', 'chip', 'smartphone', 'internet'],
+  Health: ['health', 'hospital', 'medical', 'medicine', 'vaccine', 'disease', 'doctor', 'wellness', 'covid'],
+  Financial: ['finance', 'financial', 'economy', 'economic', 'market', 'stock', 'investment', 'inflation', 'bank', 'gdp', 'business'],
+  Environmental: ['climate', 'environment', 'pollution', 'emission', 'wildfire', 'flood', 'drought', 'sustainability', 'renewable'],
+  Campaigning: ['campaign', 'protest', 'activist', 'rally', 'petition', 'advocacy', 'boycott', 'movement']
+};
 
 const LANGUAGE_NAMES = {
   en: 'English',
@@ -66,10 +107,7 @@ function fallbackSummaryFromText(articleText) {
 }
 
 function normalizeAiPayload(payload) {
-  const category = String(payload.category || '').trim();
-  const safeCategory = ALLOWED_CATEGORIES.includes(category)
-    ? category
-    : ALLOWED_CATEGORIES.find((name) => name.toLowerCase() === category.toLowerCase()) || 'Social';
+  const safeCategory = normalizeCategoryInput(payload.category) || 'World';
 
   const tags = Array.isArray(payload.tags)
     ? payload.tags
@@ -125,7 +163,7 @@ async function processArticleWithAi(articleText) {
   if (!articleText) {
     return {
       summary: '',
-      category: 'Social',
+      category: 'World',
       tags: []
     };
   }
@@ -140,20 +178,57 @@ async function processArticleWithAi(articleText) {
 
     return {
       ...result,
-      summary: result.summary || fallbackSummaryFromText(articleText)
+      summary: result.summary || fallbackSummaryFromText(articleText),
+      category:
+        result.category === 'World'
+          ? classifyArticleCategory(articleText)
+          : result.category
     };
   } catch (error) {
     return {
       summary: fallbackSummaryFromText(articleText),
-      category: 'Social',
+      category: classifyArticleCategory(articleText),
       tags: ['news']
     };
   }
 }
 
+function classifyArticleCategory(text) {
+  const content = String(text || '').toLowerCase();
+  if (!content) return 'World';
+
+  const categoryByScore = Object.entries(CATEGORY_KEYWORDS).map(([category, keywords]) => {
+    let score = 0;
+    for (const keyword of keywords) {
+      if (content.includes(keyword)) score += 1;
+    }
+    return { category, score };
+  });
+
+  categoryByScore.sort((a, b) => b.score - a.score);
+  return categoryByScore[0]?.score > 0 ? categoryByScore[0].category : 'World';
+}
+
 function normalizeLanguageCode(languageCode) {
   const code = String(languageCode || 'en').toLowerCase();
   return SUPPORTED_LANGUAGE_CODES.includes(code) ? code : 'en';
+}
+
+function normalizeCategoryInput(category) {
+  const raw = String(category || '').trim();
+  if (!raw) return undefined;
+
+  const exact = ALLOWED_CATEGORIES.find((name) => name.toLowerCase() === raw.toLowerCase());
+  if (exact) return exact;
+
+  const alias = CATEGORY_ALIASES[raw.toLowerCase()];
+  if (typeof alias === 'string') {
+    if (!alias) return undefined;
+    const normalizedAlias = ALLOWED_CATEGORIES.find((name) => name.toLowerCase() === alias.toLowerCase());
+    return normalizedAlias || undefined;
+  }
+
+  return undefined;
 }
 
 async function translateText(text, languageCode) {
@@ -199,6 +274,8 @@ module.exports = {
   processArticleWithAi,
   ALLOWED_CATEGORIES,
   SUPPORTED_LANGUAGE_CODES,
+  classifyArticleCategory,
   normalizeLanguageCode,
+  normalizeCategoryInput,
   translateText
 };
